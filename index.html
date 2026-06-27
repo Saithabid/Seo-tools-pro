@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SEO Tools Pro — Guest Post & SEO Toolkit</title>
+<meta name="description" content="All-in-one SEO and guest posting toolkit. Find sites, generate outreach emails, track backlinks, and manage campaigns."/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a0f;
+--surface:#12121a;
+--surface2:#1a1a26;
+--border:#2a2a3a;
+--accent:#6c63ff;
+--accent2:#ff6584;
+--accent3:#43e97b;
+--text:#f0f0f8;
+--muted:#8888aa;
+--danger:#ff4757;
+--warning:#ffa502;
+--success:#2ed573;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+
+/* UTILITIES */
+.hidden{display:none!important}
+.flex{display:flex}
+.flex-col{flex-direction:column}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.justify-center{justify-content:center}
+.gap-1{gap:8px}
+.gap-2{gap:16px}
+.gap-3{gap:24px}
+.text-center{text-align:center}
+.w-full{width:100%}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#5a52e0;transform:translateY(-1px)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#e03545}
+.btn-success{background:var(--success);color:#000}
+.btn-success:hover{background:#25c060}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-lg{padding:14px 32px;font-size:16px}
+
+/* INPUTS */
+.input{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border .2s}
+.input:focus{border-color:var(--accent)}
+.input::placeholder{color:var(--muted)}
+textarea.input{resize:vertical;min-height:100px}
+select.input{cursor:pointer}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.form-group label{font-size:13px;color:var(--muted);font-weight:500}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-hover{transition:border .2s,transform .2s}
+.card-hover:hover{border-color:var(--accent);transform:translateY(-2px)}
+
+/* BADGE */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
+.badge-free{background:#1a2a1a;color:var(--success);border:1px solid var(--success)}
+.badge-starter{background:#1a1a2a;color:#7b8cde;border:1px solid #7b8cde}
+.badge-pro{background:#2a1a2a;color:var(--accent);border:1px solid var(--accent)}
+.badge-agency{background:#2a1a1a;color:var(--accent2);border:1px solid var(--accent2)}
+.badge-active{background:#1a2a1a;color:var(--success)}
+.badge-inactive{background:#2a1a1a;color:var(--danger)}
+.badge-pending{background:#2a2a1a;color:var(--warning)}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast-item{padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;animation:slideIn .3s ease;max-width:320px}
+.toast-success{background:#1a3a1a;border:1px solid var(--success);color:var(--success)}
+.toast-error{background:#3a1a1a;border:1px solid var(--danger);color:var(--danger)}
+.toast-info{background:#1a1a3a;border:1px solid var(--accent);color:var(--accent)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:20px;margin-bottom:20px}
+
+/* LOADING */
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9000;flex-direction:column;gap:16px}
+
+/* NAVBAR */
+.navbar{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--accent)}
+.nav-actions{display:flex;align-items:center;gap:12px}
+.plan-chip{padding:4px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--muted)}
+
+/* SIDEBAR */
+.app-layout{display:flex;min-height:calc(100vh - 60px)}
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:16px 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.sidebar-section{padding:8px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s;border-left:3px solid transparent}
+.sidebar-item:hover{color:var(--text);background:var(--surface2)}
+.sidebar-item.active{color:var(--accent);background:rgba(108,99,255,.08);border-left-color:var(--accent)}
+.sidebar-item .icon{font-size:16px;width:20px;text-align:center}
+.main-content{flex:1;padding:24px;overflow-y:auto;min-width:0}
+
+/* LANDING PAGE */
+.landing{min-height:100vh}
+.hero{padding:80px 24px;text-align:center;background:radial-gradient(ellipse at 50% 0%, rgba(108,99,255,.15) 0%, transparent 70%)}
+.hero h1{font-size:clamp(32px,6vw,64px);font-weight:700;line-height:1.1;margin-bottom:20px}
+.hero h1 .highlight{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:18px;color:var(--muted);max-width:560px;margin:0 auto 36px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;padding:0 24px 60px}
+.tool-card-landing{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s}
+.tool-card-landing:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 32px rgba(108,99,255,.2)}
+.tool-icon{font-size:28px;margin-bottom:12px}
+.tool-name{font-size:15px;font-weight:600;margin-bottom:6px}
+.tool-desc{font-size:13px;color:var(--muted);line-height:1.5}
+.section-title{text-align:center;padding:48px 24px 32px}
+.section-title h2{font-size:clamp(24px,4vw,40px);margin-bottom:12px}
+.section-title p{color:var(--muted);font-size:16px}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:0 24px 60px;max-width:1000px;margin:0 auto}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;transition:all .2s}
+.price-card.popular{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.price-amount{font-size:36px;font-weight:700;font-family:'Space Grotesk',sans-serif;margin:16px 0 4px}
+.price-amount span{font-size:16px;color:var(--muted);font-weight:400}
+.price-yearly{font-size:13px;color:var(--success);margin-bottom:20px}
+.price-features{list-style:none;margin-bottom:24px}
+.price-features li{padding:8px 0;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.price-features li:last-child{border:none}
+.check{color:var(--success)}
+.cross{color:var(--danger)}
+
+/* TOOLS */
+.tool-header{margin-bottom:24px}
+.tool-header h2{font-size:24px;margin-bottom:6px}
+.tool-header p{color:var(--muted);font-size:14px}
+.tool-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:13px;line-height:1.7;white-space:pre-wrap;min-height:100px;position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:11px;color:var(--muted)}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.use-counter{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* TRACKER TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 12px;text-align:left;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:var(--surface2)}
+td{padding:10px 12px;border-bottom:1px solid var(--border)}
+tr:hover td{background:var(--surface2)}
+
+/* ADMIN */
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.stat-num{font-size:32px;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* CAMPAIGN */
+.campaign-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s}
+
+/* UPGRADE WALL */
+.upgrade-wall{text-align:center;padding:48px 24px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+.upgrade-wall h3{font-size:22px;margin-bottom:12px}
+.upgrade-wall p{color:var(--muted);margin-bottom:24px}
+
+/* PAYMENT MODAL */
+.payment-methods{display:grid;gap:12px}
+.pay-method{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:border .2s}
+.pay-method:hover,.pay-method.selected{border-color:var(--accent)}
+.pay-method h4{font-size:14px;margin-bottom:4px}
+.pay-method p{font-size:12px;color:var(--muted)}
+.pay-details{background:var(--surface2);border:1px solid var(--accent);border-radius:10px;padding:16px;margin-top:12px;font-size:13px;line-height:1.8}
+
+/* MOBILE */
+@media(max-width:700px){
+.sidebar{display:none}
+.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:100;padding:8px 0}
+.mobile-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;cursor:pointer;font-size:9px;color:var(--muted);transition:color .2s}
+.mobile-nav-item.active{color:var(--accent)}
+.mobile-nav-item .icon{font-size:20px}
+.main-content{padding:16px;padding-bottom:80px}
+}
+@media(min-width:701px){.mobile-nav{display:none}}
+
+/* PROFILE */
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer}
+.dropdown{position:absolute;top:52px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px;min-width:180px;z-index:200}
+.dropdown-item{padding:10px 14px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;color:var(--muted);transition:all .2s}
+.dropdown-item:hover{background:var(--surface2);color:var(--text)}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+<div id="loading" class="loading-screen">
+  <div class="spinner"></div>
+  <p style="color:var(--muted);font-size:14px">Loading...</p>
+</div>
+
+<!-- ===== LANDING PAGE ===== -->
+<div id="page-landing" class="landing hidden">
+  <nav class="navbar">
+    <div class="nav-logo">⚡ SEO<span>Tools</span>Pro</div>
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showAuth('login')">Login</button>
+      <button class="btn btn-primary btn-sm" onclick="showAuth('signup')">Get Started Free</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>The Ultimate <span class="highlight">Guest Post</span><br>& SEO Toolkit</h1>
+    <p>Find sites, write outreach emails with AI, track backlinks, and manage all your campaigns — in one place.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary btn-lg" onclick="showAuth('signup')">Start Free — No Card Needed</button>
+      <button class="btn btn-ghost btn-lg" onclick="document.getElementById('pricing-section').scrollIntoView({behavior:'smooth'})">See Pricing</button>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <h2>Every Tool You Need</h2>
+    <p>From finding guest post opportunities to tracking your backlinks</p>
+  </div>
+  <div class="tools-grid" id="landing-tools-grid"></div>
+
+  <div class="section-title" id="pricing-section">
+    <h2>Simple, Transparent Pricing</h2>
+    <p>Start free, upgrade when you're ready</p>
+  </div>
+  <div class="pricing-grid" id="landing-pricing"></div>
+
+  <div style="text-align:center;padding:48px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px">
+    <p>© 2025 SEOToolsPro · All rights reserved</p>
+    <p style="margin-top:8px">Payment: JazzCash · Easypaisa · USDT TRC20 · Binance Pay</p>
+  </div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div id="auth-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <h3 id="auth-title">Create Account</h3>
+      <button onclick="document.getElementById('auth-modal').classList.add('hidden')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <div id="auth-form">
+      <div class="form-group" id="name-group">
+        <label>Full Name</label>
+        <input class="input" id="auth-name" placeholder="Your name"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input class="input" id="auth-email" type="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input class="input" id="auth-pass" type="password" placeholder="Min 6 characters"/>
+      </div>
+      <button class="btn btn-primary w-full" id="auth-submit-btn" onclick="handleAuth()" style="margin-top:8px">Create Account</button>
+      <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--muted)">
+        <span id="auth-switch-text">Already have an account?</span>
+        <span style="color:var(--accent);cursor:pointer;margin-left:4px" id="auth-switch-btn" onclick="toggleAuthMode()">Login</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== UPGRADE MODAL ===== -->
+<div id="upgrade-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3>Upgrade Your Plan</h3>
+      <button onclick="document.getElementById('upgrade-modal').classList.add('hidden')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <div id="upgrade-plans-list"></div>
+  </div>
+</div>
+
+<!-- ===== PAYMENT MODAL ===== -->
+<div id="payment-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3>Complete Payment</h3>
+      <button onclick="document.getElementById('payment-modal').classList.add('hidden')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <div id="payment-content"></div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="page-app" class="hidden">
+  <nav class="navbar">
+    <div class="nav-logo">⚡ SEO<span>Tools</span>Pro</div>
+    <div class="nav-actions" style="position:relative">
+      <span class="plan-chip" id="nav-plan-chip">Free</span>
+      <div class="avatar" id="nav-avatar" onclick="toggleDropdown()">U</div>
+      <div class="dropdown hidden" id="nav-dropdown">
+        <div class="dropdown-item" onclick="showPage('profile')">👤 My Account</div>
+        <div class="dropdown-item" onclick="showUpgradeModal()">⚡ Upgrade Plan</div>
+        <div class="dropdown-item" id="admin-link" onclick="showPage('admin')" style="display:none">🛡️ Admin Panel</div>
+        <div class="dropdown-item" style="color:var(--danger)" onclick="logout()">🚪 Logout</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-layout">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-section">Tools</div>
+      <div class="sidebar-item" onclick="showPage('dashboard')"><span class="icon">📊</span>Dashboard</div>
+      <div class="sidebar-item" onclick="showPage('site-finder')"><span class="icon">🔍</span>Site Finder</div>
+      <div class="sidebar-item" onclick="showPage('email-gen')"><span class="icon">📧</span>Email Generator</div>
+      <div class="sidebar-item" onclick="showPage('content-brief')"><span class="icon">📝</span>Content Brief</div>
+      <div class="sidebar-item" onclick="showPage('backlink-tracker')"><span class="icon">🔗</span>Backlink Tracker</div>
+      <div class="sidebar-item" onclick="showPage('campaign')"><span class="icon">🎯</span>Campaign Manager</div>
+      <div class="sidebar-item" onclick="showPage('da-checker')"><span class="icon">📈</span>DA Checker</div>
+      <div class="sidebar-item" onclick="showPage('keyword-gap')"><span class="icon">🔑</span>Keyword Gap</div>
+      <div class="sidebar-item" onclick="showPage('anchor-text')"><span class="icon">⚓</span>Anchor Text Gen</div>
+      <div class="sidebar-item" onclick="showPage('robots-gen')"><span class="icon">🤖</span>Robots.txt Gen</div>
+      <div class="sidebar-section">Account</div>
+      <div class="sidebar-item" onclick="showPage('profile')"><span class="icon">👤</span>My Account</div>
+      <div class="sidebar-item" onclick="showUpgradeModal()"><span class="icon">⚡</span>Upgrade</div>
+    </div>
+
+    <div class="main-content" id="main-content"></div>
+  </div>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <div class="mobile-nav-item" onclick="showPage('dashboard')"><span class="icon">📊</span>Home</div>
+    <div class="mobile-nav-item" onclick="showPage('site-finder')"><span class="icon">🔍</span>Find</div>
+    <div class="mobile-nav-item" onclick="showPage('email-gen')"><span class="icon">📧</span>Email</div>
+    <div class="mobile-nav-item" onclick="showPage('campaign')"><span class="icon">🎯</span>Campaigns</div>
+    <div class="mobile-nav-item" onclick="showPage('profile')"><span class="icon">👤</span>Account</div>
+  </div>
+</div>
+
+<script>
+// ===== FIREBASE CONFIG =====
+const firebaseConfig = {
+  apiKey: "AIzaSyAEbRa5eMTqwuAVWFIMlgJX7bk8bwBIR7U",
+  authDomain: "seo-tools-c56f1.firebaseapp.com",
+  projectId: "seo-tools-c56f1",
+  storageBucket: "seo-tools-c56f1.firebasestorage.app",
+  messagingSenderId: "1016397578321",
+  appId: "1:1016397578321:web:58b803693cc36d8826f870",
+  databaseURL: "https://seo-tools-c56f1-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+// ===== CONSTANTS =====
+const ADMIN_EMAIL = "waqas@seotoolspro.com"; // Change to your email
+const PLANS = {
+  free:    {name:"Free",    monthly:0,  yearly:0,   limit:5,   color:"#2ed573"},
+  starter: {name:"Starter", monthly:9,  yearly:79,  limit:50,  color:"#7b8cde"},
+  pro:     {name:"Pro",     monthly:19, yearly:159, limit:999, color:"#6c63ff"},
+  agency:  {name:"Agency",  monthly:39, yearly:319, limit:999, color:"#ff6584"}
+};
+const TOOLS_LIST = [
+  {id:"site-finder",    name:"Guest Post Site Finder",   icon:"🔍", desc:"Find websites accepting guest posts in any niche"},
+  {id:"email-gen",      name:"AI Email Generator",        icon:"📧", desc:"Generate personalized outreach emails instantly"},
+  {id:"content-brief",  name:"Content Brief Generator",   icon:"📝", desc:"SEO-optimized content briefs with headings & keywords"},
+  {id:"backlink-tracker",name:"Backlink Tracker",         icon:"🔗", desc:"Track status of all your submitted backlinks"},
+  {id:"campaign",       name:"Campaign Manager",          icon:"🎯", desc:"Manage all your outreach campaigns in one place"},
+  {id:"da-checker",     name:"Domain Authority Checker",  icon:"📈", desc:"Estimate domain authority and SEO metrics"},
+  {id:"keyword-gap",    name:"Keyword Gap Analyzer",      icon:"🔑", desc:"Find keyword opportunities your competitors rank for"},
+  {id:"anchor-text",    name:"Anchor Text Generator",     icon:"⚓", desc:"Generate natural anchor text variations for links"},
+  {id:"robots-gen",     name:"Robots.txt Generator",      icon:"🤖", desc:"Create optimized robots.txt for your website"},
+  {id:"meta-gen",       name:"Meta Tags Generator",       icon:"🏷️", desc:"Generate perfect SEO meta titles and descriptions"}
+];
+
+// ===== STATE =====
+let currentUser = null;
+let userProfile = null;
+let currentPage = 'dashboard';
+let authMode = 'signup';
+let deviceToken = null;
+
+// ===== DEVICE TOKEN =====
+function getDeviceToken(){
+  let t = localStorage.getItem('seo_device_token');
+  if(!t){ t = 'dev_'+Date.now()+'_'+Math.random().toString(36).substr(2,9); localStorage.setItem('seo_device_token',t); }
+  return t;
+}
+deviceToken = getDeviceToken();
+
+// ===== TOAST =====
+function toast(msg, type='info'){
+  const el = document.createElement('div');
+  el.className = `toast-item toast-${type}`;
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(), 3500);
+}
+
+// ===== AUTH =====
+auth.onAuthStateChanged(async user=>{
+  document.getElementById('loading').classList.add('hidden');
+  if(user){
+    currentUser = user;
+    await loadUserProfile();
+    // Check single session
+    const sessionRef = db.ref(`sessions/${user.uid}`);
+    const snap = await sessionRef.get();
+    if(snap.exists() && snap.val().token !== deviceToken){
+      await auth.signOut();
+      toast("Your account was logged in from another device. Logged out here.","error");
+      showLanding();
+      return;
+    }
+    // Set session
+    await sessionRef.set({token:deviceToken, ts:Date.now()});
+    // Refresh session every 3 hours
+    setInterval(async()=>{
+      if(currentUser) await sessionRef.set({token:deviceToken, ts:Date.now()});
+    }, 3*60*60*1000);
+    showApp();
+  } else {
+    currentUser = null;
+    userProfile = null;
+    showLanding();
+  }
+});
+
+async function loadUserProfile(){
+  const snap = await db.ref(`users/${currentUser.uid}`).get();
+  if(snap.exists()){
+    userProfile = snap.val();
+  } else {
+    // New user - create profile
+    userProfile = {
+      name: currentUser.displayName || currentUser.email.split('@')[0],
+      email: currentUser.email,
+      plan: 'free',
+      billing: 'monthly',
+      status: 'active',
+      usage: {},
+      joinedAt: Date.now()
+    };
+    await db.ref(`users/${currentUser.uid}`).set(userProfile);
+  }
+}
+
+function showAuth(mode){
+  authMode = mode;
+  document.getElementById('auth-modal').classList.remove('hidden');
+  if(mode==='login'){
+    document.getElementById('auth-title').textContent='Login';
+    document.getElementById('name-group').classList.add('hidden');
+    document.getElementById('auth-submit-btn').textContent='Login';
+    document.getElementById('auth-switch-text').textContent="Don't have an account?";
+    document.getElementById('auth-switch-btn').textContent='Sign Up';
+  } else {
+    document.getElementById('auth-title').textContent='Create Account';
+    document.getElementById('name-group').classList.remove('hidden');
+    document.getElementById('auth-submit-btn').textContent='Create Account';
+    document.getElementById('auth-switch-text').textContent='Already have an account?';
+    document.getElementById('auth-switch-btn').textContent='Login';
+  }
+}
+function toggleAuthMode(){ showAuth(authMode==='login'?'signup':'login'); }
+
+async function handleAuth(){
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const name = document.getElementById('auth-name').value.trim();
+  if(!email||!pass){ toast("Please fill all fields","error"); return; }
+  const btn = document.getElementById('auth-submit-btn');
+  btn.textContent='Please wait...'; btn.disabled=true;
+  try {
+    if(authMode==='signup'){
+      const cred = await auth.createUserWithEmailAndPassword(email,pass);
+      await cred.user.updateProfile({displayName:name});
+      toast("Account created! Welcome 🎉","success");
+    } else {
+      await auth.signInWithEmailAndPassword(email,pass);
+      toast("Welcome back!","success");
+    }
+    document.getElementById('auth-modal').classList.add('hidden');
+  } catch(e){
+    toast(e.message,"error");
+  }
+  btn.textContent=authMode==='signup'?'Create Account':'Login'; btn.disabled=false;
+}
+
+async function logout(){
+  if(currentUser) await db.ref(`sessions/${currentUser.uid}`).remove();
+  await auth.signOut();
+  toast("Logged out","info");
+}
+
+// ===== PAGES =====
+function showLanding(){
+  document.getElementById('page-landing').classList.remove('hidden');
+  document.getElementById('page-app').classList.add('hidden');
+  renderLandingTools();
+  renderLandingPricing();
+}
+
+function showApp(){
+  document.getElementById('page-landing').classList.add('hidden');
+  document.getElementById('page-app').classList.remove('hidden');
+  // Update nav
+  const plan = userProfile?.plan||'free';
+  document.getElementById('nav-plan-chip').textContent = PLANS[plan]?.name||'Free';
+  document.getElementById('nav-plan-chip').style.color = PLANS[plan]?.color||'#2ed573';
+  const initials = (userProfile?.name||currentUser?.email||'U').charAt(0).toUpperCase();
+  document.getElementById('nav-avatar').textContent = initials;
+  // Show admin link if admin
+  if(currentUser?.email === ADMIN_EMAIL || userProfile?.isAdmin){
+    document.getElementById('admin-link').style.display='flex';
+  }
+  showPage('dashboard');
+}
+
+function showPage(id){
+  currentPage = id;
+  // Update sidebar active
+  document.querySelectorAll('.sidebar-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('onclick')?.includes(id));
+  });
+  document.querySelectorAll('.mobile-nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('onclick')?.includes(id));
+  });
+  document.getElementById('nav-dropdown').classList.add('hidden');
+  const mc = document.getElementById('main-content');
+  switch(id){
+    case 'dashboard': mc.innerHTML = renderDashboard(); break;
+    case 'site-finder': mc.innerHTML = renderSiteFinder(); break;
+    case 'email-gen': mc.innerHTML = renderEmailGen(); break;
+    case 'content-brief': mc.innerHTML = renderContentBrief(); break;
+    case 'backlink-tracker': mc.innerHTML = renderBacklinkTracker(); loadBacklinks(); break;
+    case 'campaign': mc.innerHTML = renderCampaign(); loadCampaigns(); break;
+    case 'da-checker': mc.innerHTML = renderDAChecker(); break;
+    case 'keyword-gap': mc.innerHTML = renderKeywordGap(); break;
+    case 'anchor-text': mc.innerHTML = renderAnchorText(); break;
+    case 'robots-gen': mc.innerHTML = renderRobotsGen(); break;
+    case 'meta-gen': mc.innerHTML = renderMetaGen(); break;
+    case 'profile': mc.innerHTML = renderProfile(); break;
+    case 'admin': mc.innerHTML = renderAdmin(); loadAdminData(); break;
+    default: mc.innerHTML = renderDashboard();
+  }
+}
+
+function toggleDropdown(){
+  document.getElementById('nav-dropdown').classList.toggle('hidden');
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('#nav-avatar') && !e.target.closest('#nav-dropdown')){
+    document.getElementById('nav-dropdown')?.classList.add('hidden');
+  }
+});
+
+// ===== USAGE CHECK =====
+function getUsageKey(toolId){ return `tool_${toolId}_${new Date().toISOString().slice(0,7)}`; }
+function getLimit(){ return PLANS[userProfile?.plan||'free']?.limit||5; }
+async function checkAndUse(toolId){
+  const key = getUsageKey(toolId);
+  const current = userProfile?.usage?.[key]||0;
+  const limit = getLimit();
+  const plan = userProfile?.plan||'free';
+  if(plan!=='free' && plan!=='starter') return true; // Pro/Agency unlimited
+  if(current >= limit) return false;
+  // Increment usage
+  const newVal = current+1;
+  await db.ref(`users/${currentUser.uid}/usage/${key}`).set(newVal);
+  if(!userProfile.usage) userProfile.usage={};
+  userProfile.usage[key] = newVal;
+  return true;
+}
+function getUsageDisplay(toolId){
+  const key = getUsageKey(toolId);
+  const current = userProfile?.usage?.[key]||0;
+  const limit = getLimit();
+  const plan = userProfile?.plan||'free';
+  if(plan==='pro'||plan==='agency') return '<span style="color:var(--success)">✓ Unlimited uses</span>';
+  return `Uses this month: ${current}/${limit}`;
+}
+
+// ===== CLAUDE API =====
+async function callClaude(prompt){
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-6",
+      max_tokens:1000,
+      messages:[{role:"user",content:prompt}]
+    })
+  });
+  const data = await res.json();
+  return data.content?.[0]?.text || "Error generating response.";
+}
+
+// ===== LANDING RENDERS =====
+function renderLandingTools(){
+  const g = document.getElementById('landing-tools-grid');
+  g.innerHTML = TOOLS_LIST.map(t=>`
+    <div class="tool-card-landing" onclick="showAuth('signup')">
+      <div class="tool-icon">${t.icon}</div>
+      <div class="tool-name">${t.name}</div>
+      <div class="tool-desc">${t.desc}</div>
+    </div>
+  `).join('');
+}
+function renderLandingPricing(){
+  const g = document.getElementById('landing-pricing');
+  g.innerHTML = Object.entries(PLANS).map(([key,p])=>`
+    <div class="price-card ${key==='pro'?'popular':''}">
+      ${key==='pro'?'<div class="popular-badge">Most Popular</div>':''}
+      <span class="badge badge-${key}">${p.name}</span>
+      <div class="price-amount">$${p.monthly}<span>/mo</span></div>
+      <div class="price-yearly">${p.yearly>0?'$'+p.yearly+'/year (save more)':'Always free'}</div>
+      <ul class="price-features">
+        <li><span class="check">✓</span>${p.limit===999?'Unlimited':'Up to '+p.limit} uses/tool/month</li>
+        <li><span class="${key==='free'?'cross':'check'}">${key==='free'?'✗':'✓'}</span> AI-powered tools</li>
+        <li><span class="${key==='free'||key==='starter'?'cross':'check'}">${key==='free'||key==='starter'?'✗':'✓'}</span> Unlimited campaigns</li>
+        <li><span class="${key==='agency'?'check':'cross'}">${key==='agency'?'✓':'✗'}</span> 3 team accounts</li>
+        <li><span class="check">✓</span> All ${TOOLS_LIST.length} tools access</li>
+      </ul>
+      <button class="btn btn-primary w-full" onclick="showAuth('signup')">${key==='free'?'Get Started Free':'Choose '+p.name}</button>
+    </div>
+  `).join('');
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const plan = userProfile?.plan||'free';
+  const usageItems = TOOLS_LIST.slice(0,4).map(t=>{
+    const key = getUsageKey(t.id);
+    const used = userProfile?.usage?.[key]||0;
+    const limit = getLimit();
+    const pct = plan==='pro'||plan==='agency'?100:Math.min(100,Math.round(used/limit*100));
+    return `
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+          <span>${t.icon} ${t.name}</span>
+          <span style="color:var(--muted)">${plan==='pro'||plan==='agency'?'∞':used+'/'+limit}</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="tool-header">
+      <h2>Welcome back, ${userProfile?.name||'User'} 👋</h2>
+      <p>Your SEO & Guest Post command center</p>
+    </div>
+    <div class="stat-cards">
+      <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${PLANS[plan]?.name}</div><div class="stat-label">Current Plan</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--success)">${TOOLS_LIST.length}</div><div class="stat-label">Tools Available</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--accent2)">${getLimit()===999?'∞':getLimit()}</div><div class="stat-label">Uses/Tool/Month</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-bottom:16px;font-size:16px">📊 This Month's Usage</h3>
+        ${usageItems}
+        ${plan==='free'?`<button class="btn btn-primary w-full btn-sm" onclick="showUpgradeModal()">⚡ Upgrade for More</button>`:''}
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;font-size:16px">🚀 Quick Actions</h3>
+        ${TOOLS_LIST.slice(0,5).map(t=>`
+          <div onclick="showPage('${t.id}')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;margin-bottom:6px;transition:background .2s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+            <span style="font-size:20px">${t.icon}</span>
+            <div><div style="font-size:13px;font-weight:500">${t.name}</div><div style="font-size:11px;color:var(--muted)">${t.desc}</div></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+// ===== SITE FINDER =====
+function renderSiteFinder(){
+  return `
+    <div class="tool-header">
+      <h2>🔍 Guest Post Site Finder</h2>
+      <p>Find websites accepting guest posts in your niche</p>
+    </div>
+    <div class="tool-box">
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Your Niche / Topic</label>
+          <input class="input" id="sf-niche" placeholder="e.g. digital marketing, fitness, tech"/>
+        </div>
+        <div class="form-group">
+          <label>Minimum DA (0-100)</label>
+          <input class="input" id="sf-da" type="number" placeholder="e.g. 30" min="0" max="100"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Content Type</label>
+        <select class="input" id="sf-type">
+          <option value="guest post">Guest Post</option>
+          <option value="sponsored post">Sponsored Post</option>
+          <option value="link insertion">Link Insertion</option>
+          <option value="niche edit">Niche Edit</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="runSiteFinder()">🔍 Find Sites</button>
+      <div class="use-counter" id="sf-counter">${getUsageDisplay('site-finder')}</div>
+    </div>
+    <div id="sf-result"></div>`;
+}
+
+async function runSiteFinder(){
+  const niche = document.getElementById('sf-niche').value.trim();
+  const da = document.getElementById('sf-da').value||'20';
+  const type = document.getElementById('sf-type').value;
+  if(!niche){ toast("Enter your niche first","error"); return; }
+  const ok = await checkAndUse('site-finder');
+  if(!ok){ showUpgradeWall('sf-result'); return; }
+  document.getElementById('sf-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div><p style="color:var(--muted);margin-top:12px">Finding guest post opportunities...</p></div>';
+  document.getElementById('sf-counter').innerHTML = getUsageDisplay('site-finder');
+  const prompt = `You are an SEO expert. Generate a list of 10 realistic websites that accept ${type}s in the "${niche}" niche with minimum DA ${da}. For each site provide: Site Name, URL (realistic but fictional), DA score (${da}-90), Contact method, Notes. Format as a clean HTML table with columns: Site, URL, DA, Contact, Notes. Use these colors: table header bg #1a1a26, border #2a2a3a, text #f0f0f8. Make it look professional.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('sf-result').innerHTML = `<div class="tool-box">${result}</div>`;
+  } catch(e){ document.getElementById('sf-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error. Please try again.</div>'; }
+}
+
+// ===== EMAIL GENERATOR =====
+function renderEmailGen(){
+  return `
+    <div class="tool-header">
+      <h2>📧 AI Outreach Email Generator</h2>
+      <p>Generate personalized pitches that get replies</p>
+    </div>
+    <div class="tool-box">
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Target Website</label>
+          <input class="input" id="eg-site" placeholder="e.g. neilpatel.com"/>
+        </div>
+        <div class="form-group">
+          <label>Your Name</label>
+          <input class="input" id="eg-name" value="${userProfile?.name||''}" placeholder="Your name"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Your Article Topic / Idea</label>
+        <input class="input" id="eg-topic" placeholder="e.g. 10 Advanced Link Building Strategies for 2025"/>
+      </div>
+      <div class="form-group">
+        <label>Email Tone</label>
+        <select class="input" id="eg-tone">
+          <option value="professional">Professional</option>
+          <option value="friendly">Friendly & Casual</option>
+          <option value="short and direct">Short & Direct</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="runEmailGen()">✨ Generate Email</button>
+      <div class="use-counter" id="eg-counter">${getUsageDisplay('email-gen')}</div>
+    </div>
+    <div id="eg-result"></div>`;
+}
+
+async function runEmailGen(){
+  const site = document.getElementById('eg-site').value.trim();
+  const name = document.getElementById('eg-name').value.trim();
+  const topic = document.getElementById('eg-topic').value.trim();
+  const tone = document.getElementById('eg-tone').value;
+  if(!site||!topic){ toast("Fill all fields","error"); return; }
+  const ok = await checkAndUse('email-gen');
+  if(!ok){ showUpgradeWall('eg-result'); return; }
+  document.getElementById('eg-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
+  document.getElementById('eg-counter').innerHTML = getUsageDisplay('email-gen');
+  const prompt = `Write a ${tone} guest post outreach email. From: ${name}. Target site: ${site}. Article idea: "${topic}". The email should have: Subject line, greeting, brief intro (who you are), pitch (why this article suits their audience), your credentials (make up realistic ones), call to action. Keep it concise and compelling. Format with SUBJECT: on first line, then the email body.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('eg-result').innerHTML = `
+      <div class="tool-box">
+        <div class="result-box" id="eg-output">${result}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="copyText('eg-output')">📋 Copy Email</button>
+      </div>`;
+  } catch(e){ document.getElementById('eg-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error. Please try again.</div>'; }
+}
+
+// ===== CONTENT BRIEF =====
+function renderContentBrief(){
+  return `
+    <div class="tool-header">
+      <h2>📝 Content Brief Generator</h2>
+      <p>Get a complete SEO content brief in seconds</p>
+    </div>
+    <div class="tool-box">
+      <div class="form-group">
+        <label>Article Topic / Target Keyword</label>
+        <input class="input" id="cb-topic" placeholder="e.g. How to build backlinks in 2025"/>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Target Audience</label>
+          <input class="input" id="cb-audience" placeholder="e.g. beginner bloggers"/>
+        </div>
+        <div class="form-group">
+          <label>Word Count Target</label>
+          <select class="input" id="cb-words">
+            <option value="1000-1500">1000-1500 words</option>
+            <option value="1500-2500" selected>1500-2500 words</option>
+            <option value="2500-4000">2500-4000 words</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="runContentBrief()">📝 Generate Brief</button>
+      <div class="use-counter" id="cb-counter">${getUsageDisplay('content-brief')}</div>
+    </div>
+    <div id="cb-result"></div>`;
+}
+
+async function runContentBrief(){
+  const topic = document.getElementById('cb-topic').value.trim();
+  const audience = document.getElementById('cb-audience').value.trim()||'general readers';
+  const words = document.getElementById('cb-words').value;
+  if(!topic){ toast("Enter a topic","error"); return; }
+  const ok = await checkAndUse('content-brief');
+  if(!ok){ showUpgradeWall('cb-result'); return; }
+  document.getElementById('cb-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
+  document.getElementById('cb-counter').innerHTML = getUsageDisplay('content-brief');
+  const prompt = `Create a detailed SEO content brief for: "${topic}". Target audience: ${audience}. Word count: ${words}. Include: 1) Meta Title (60 chars), 2) Meta Description (155 chars), 3) Primary keyword + 5 LSI keywords, 4) H2 and H3 headings outline, 5) Key points to cover in each section, 6) Internal/external linking suggestions, 7) Content angle recommendation. Format clearly with sections.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('cb-result').innerHTML = `
+      <div class="tool-box">
+        <div class="result-box" id="cb-output">${result}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="copyText('cb-output')">📋 Copy Brief</button>
+      </div>`;
+  } catch(e){ document.getElementById('cb-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error. Please try again.</div>'; }
+}
+
+// ===== BACKLINK TRACKER =====
+let backlinks = [];
+function renderBacklinkTracker(){
+  return `
+    <div class="tool-header">
+      <h2>🔗 Backlink Tracker</h2>
+      <p>Track all your submitted backlinks in one place</p>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div></div>
+      <button class="btn btn-primary btn-sm" onclick="showAddBacklink()">+ Add Backlink</button>
+    </div>
+    <div id="bl-add-form" class="tool-box hidden" style="margin-bottom:16px">
+      <h3 style="font-size:16px;margin-bottom:16px">Add New Backlink</h3>
+      <div class="grid-2">
+        <div class="form-group"><label>Target Site URL</label><input class="input" id="bl-site" placeholder="https://example.com/my-article"/></div>
+        <div class="form-group"><label>Your Page URL</label><input class="input" id="bl-page" placeholder="https://yoursite.com"/></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Anchor Text</label><input class="input" id="bl-anchor" placeholder="click here"/></div>
+        <div class="form-group"><label>Status</label>
+          <select class="input" id="bl-status">
+            <option value="pending">Pending</option>
+            <option value="live">Live</option>
+            <option value="rejected">Rejected</option>
+            <option value="removed">Removed</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Notes</label><input class="input" id="bl-notes" placeholder="Any notes..."/></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="saveBacklink()">Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bl-add-form').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Target Site</th><th>Anchor</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="bl-table-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>`;
+}
+function showAddBacklink(){ document.getElementById('bl-add-form').classList.toggle('hidden'); }
+async function loadBacklinks(){
+  const snap = await db.ref(`backlinks/${currentUser.uid}`).get();
+  backlinks = [];
+  if(snap.exists()) snap.forEach(c=>backlinks.push({id:c.key,...c.val()}));
+  renderBacklinkTable();
+}
+function renderBacklinkTable(){
+  const tbody = document.getElementById('bl-table-body');
+  if(!tbody) return;
+  if(!backlinks.length){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px">No backlinks yet. Add your first one!</td></tr>'; return; }
+  tbody.innerHTML = backlinks.map(b=>`
+    <tr>
+      <td><a href="${b.site}" target="_blank" style="color:var(--accent);font-size:12px">${b.site?.replace('https://','').slice(0,35)||'—'}</a><br><span style="font-size:11px;color:var(--muted)">${b.notes||''}</span></td>
+      <td style="font-size:12px">${b.anchor||'—'}</td>
+      <td><span class="badge badge-${b.status==='live'?'active':b.status==='pending'?'pending':'inactive'}">${b.status}</span></td>
+      <td style="font-size:12px;color:var(--muted)">${b.date?new Date(b.date).toLocaleDateString():''}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteBacklink('${b.id}')">Delete</button></td>
+    </tr>`).join('');
+}
+async function saveBacklink(){
+  const site = document.getElementById('bl-site').value.trim();
+  if(!site){ toast("Enter site URL","error"); return; }
+  const data = {site, page:document.getElementById('bl-page').value.trim(), anchor:document.getElementById('bl-anchor').value.trim(), status:document.getElementById('bl-status').value, notes:document.getElementById('bl-notes').value.trim(), date:Date.now()};
+  await db.ref(`backlinks/${currentUser.uid}`).push(data);
+  toast("Backlink saved!","success");
+  document.getElementById('bl-add-form').classList.add('hidden');
+  loadBacklinks();
+}
+async function deleteBacklink(id){
+  await db.ref(`backlinks/${currentUser.uid}/${id}`).remove();
+  toast("Deleted","info");
+  loadBacklinks();
+}
+
+// ===== CAMPAIGN MANAGER =====
+let campaigns = [];
+function renderCampaign(){
+  return `
+    <div class="tool-header">
+      <h2>🎯 Campaign Manager</h2>
+      <p>Track all your outreach campaigns</p>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div></div>
+      <button class="btn btn-primary btn-sm" onclick="showAddCampaign()">+ New Campaign</button>
+    </div>
+    <div id="camp-add-form" class="tool-box hidden" style="margin-bottom:16px">
+      <h3 style="font-size:16px;margin-bottom:16px">New Campaign</h3>
+      <div class="grid-2">
+        <div class="form-group"><label>Campaign Name</label><input class="input" id="camp-name" placeholder="e.g. Finance Sites Oct 2025"/></div>
+        <div class="form-group"><label>Niche</label><input class="input" id="camp-niche" placeholder="e.g. Finance"/></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Total Sites Target</label><input class="input" id="camp-total" type="number" placeholder="20"/></div>
+        <div class="form-group"><label>Sites Contacted</label><input class="input" id="camp-contacted" type="number" placeholder="0"/></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Accepted</label><input class="input" id="camp-accepted" type="number" placeholder="0"/></div>
+        <div class="form-group"><label>Live Links</label><input class="input" id="camp-live" type="number" placeholder="0"/></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="saveCampaign()">Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('camp-add-form').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+    <div id="camp-list">Loading...</div>`;
+}
+function showAddCampaign(){ document.getElementById('camp-add-form').classList.toggle('hidden'); }
+async function loadCampaigns(){
+  const snap = await db.ref(`campaigns/${currentUser.uid}`).get();
+  campaigns = [];
+  if(snap.exists()) snap.forEach(c=>campaigns.push({id:c.key,...c.val()}));
+  renderCampaignList();
+}
+function renderCampaignList(){
+  const el = document.getElementById('camp-list');
+  if(!el) return;
+  if(!campaigns.length){ el.innerHTML='<div class="card" style="text-align:center;padding:40px;color:var(--muted)">No campaigns yet. Create your first one!</div>'; return; }
+  el.innerHTML = campaigns.map(c=>{
+    const pct = c.total>0?Math.round(c.contacted/c.total*100):0;
+    return `
+      <div class="campaign-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+          <div>
+            <h3 style="font-size:16px;margin-bottom:4px">${c.name}</h3>
+            <span style="font-size:12px;color:var(--muted)">${c.niche||''}</span>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="deleteCampaign('${c.id}')">Delete</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0">
+          <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--text)">${c.total||0}</div><div style="font-size:11px;color:var(--muted)">Target</div></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--accent)">${c.contacted||0}</div><div style="font-size:11px;color:var(--muted)">Contacted</div></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--warning)">${c.accepted||0}</div><div style="font-size:11px;color:var(--muted)">Accepted</div></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--success)">${c.live||0}</div><div style="font-size:11px;color:var(--muted)">Live</div></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Progress: ${pct}%</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('');
+}
+async function saveCampaign(){
+  const name = document.getElementById('camp-name').value.trim();
+  if(!name){ toast("Enter campaign name","error"); return; }
+  const data = {name, niche:document.getElementById('camp-niche').value.trim(), total:+document.getElementById('camp-total').value||0, contacted:+document.getElementById('camp-contacted').value||0, accepted:+document.getElementById('camp-accepted').value||0, live:+document.getElementById('camp-live').value||0, date:Date.now()};
+  await db.ref(`campaigns/${currentUser.uid}`).push(data);
+  toast("Campaign saved!","success");
+  document.getElementById('camp-add-form').classList.add('hidden');
+  loadCampaigns();
+}
+async function deleteCampaign(id){
+  await db.ref(`campaigns/${currentUser.uid}/${id}`).remove();
+  toast("Deleted","info");
+  loadCampaigns();
+}
+
+// ===== DA CHECKER =====
+function renderDAChecker(){
+  return `
+    <div class="tool-header">
+      <h2>📈 Domain Authority Checker</h2>
+      <p>Estimate domain authority and SEO metrics</p>
+    </div>
+    <div class="tool-box">
+      <div class="form-group">
+        <label>Enter Domain(s) — one per line</label>
+        <textarea class="input" id="da-domains" placeholder="example.com&#10;another-site.com&#10;thirdsite.net" style="min-height:120px"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="runDAChecker()">📈 Check Authority</button>
+      <div class="use-counter" id="da-counter">${getUsageDisplay('da-checker')}</div>
+    </div>
+    <div id="da-result"></div>`;
+}
+async function runDAChecker(){
+  const domains = document.getElementById('da-domains').value.trim();
+  if(!domains){ toast("Enter at least one domain","error"); return; }
+  const ok = await checkAndUse('da-checker');
+  if(!ok){ showUpgradeWall('da-result'); return; }
+  document.getElementById('da-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
+  document.getElementById('da-counter').innerHTML = getUsageDisplay('da-checker');
+  const prompt = `You are an SEO tool. For these domains: ${domains} — provide estimated SEO metrics in an HTML table. Columns: Domain, DA Score (1-100), PA Score, Spam Score, Est. Monthly Traffic, Backlinks Est., Verdict (Good/Average/Poor for guest posting). Use realistic but fictional numbers. Style the table with dark theme: header bg #1a1a26, borders #2a2a3a, text #f0f0f8. Color the Verdict cell: green for Good, yellow for Average, red for Poor.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('da-result').innerHTML = `<div class="tool-box">${result}</div>`;
+  } catch(e){ document.getElementById('da-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error. Please try again.</div>'; }
+}
+
+// ===== KEYWORD GAP =====
+function renderKeywordGap(){
+  return `
+    <div class="tool-header">
+      <h2>🔑 Keyword Gap Analyzer</h2>
+      <p>Find keywords your competitors rank for but you don't</p>
+    </div>
+    <div class="tool-box">
+      <div class="form-group"><label>Your Website / Topic</label><input class="input" id="kg-yours" placeholder="e.g. yoursite.com or your topic"/></div>
+      <div class="form-group"><label>Competitor 1</label><input class="input" id="kg-comp1" placeholder="competitor1.com"/></div>
+      <div class="form-group"><label>Competitor 2 (optional)</label><input class="input" id="kg-comp2" placeholder="competitor2.com"/></div>
+      <div class="form-group"><label>Niche / Industry</label><input class="input" id="kg-niche" placeholder="e.g. digital marketing"/></div>
+      <button class="btn btn-primary" onclick="runKeywordGap()">🔑 Find Keyword Gaps</button>
+      <div class="use-counter" id="kg-counter">${getUsageDisplay('keyword-gap')}</div>
+    </div>
+    <div id="kg-result"></div>`;
+}
+async function runKeywordGap(){
+  const yours = document.getElementById('kg-yours').value.trim();
+  const comp1 = document.getElementById('kg-comp1').value.trim();
+  const niche = document.getElementById('kg-niche').value.trim();
+  if(!yours||!comp1){ toast("Fill required fields","error"); return; }
+  const ok = await checkAndUse('keyword-gap');
+  if(!ok){ showUpgradeWall('kg-result'); return; }
+  document.getElementById('kg-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
+  document.getElementById('kg-counter').innerHTML = getUsageDisplay('keyword-gap');
+  const comp2 = document.getElementById('kg-comp2').value.trim();
+  const prompt = `SEO Keyword Gap Analysis. My site: ${yours}. Competitors: ${comp1}${comp2?', '+comp2:''}. Niche: ${niche||'general'}. Generate 15 keyword opportunities that competitors likely rank for but I'm missing. Format as HTML table: Keyword, Search Volume (est.), Difficulty (Easy/Medium/Hard), CPC est., Opportunity Score (1-10), Content Idea. Dark theme table: header bg #1a1a26, borders #2a2a3a, text #f0f0f8. Color difficulty: green=Easy, yellow=Medium, red=Hard.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('kg-result').innerHTML = `<div class="tool-box">${result}</div>`;
+  } catch(e){ document.getElementById('kg-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error.</div>'; }
+}
+
+// ===== ANCHOR TEXT =====
+function renderAnchorText(){
+  return `
+    <div class="tool-header">
+      <h2>⚓ Anchor Text Generator</h2>
+      <p>Generate natural anchor text variations for safe link building</p>
+    </div>
+    <div class="tool-box">
+      <div class="form-group"><label>Main Keyword / Brand</label><input class="input" id="at-kw" placeholder="e.g. best SEO tools"/></div>
+      <div class="form-group"><label>URL to Link To</label><input class="input" id="at-url" placeholder="https://yoursite.com/page"/></div>
+      <div class="form-group"><label>How many variations?</label>
+        <select class="input" id="at-count"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option></select>
+      </div>
+      <button class="btn btn-primary" onclick="runAnchorText()">⚓ Generate Anchors</button>
+      <div class="use-counter" id="at-counter">${getUsageDisplay('anchor-text')}</div>
+    </div>
+    <div id="at-result"></div>`;
+}
+async function runAnchorText(){
+  const kw = document.getElementById('at-kw').value.trim();
+  const url = document.getElementById('at-url').value.trim();
+  const count = document.getElementById('at-count').value;
+  if(!kw){ toast("Enter your keyword","error"); return; }
+  const ok = await checkAndUse('anchor-text');
+  if(!ok){ showUpgradeWall('at-result'); return; }
+  document.getElementById('at-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
+  document.getElementById('at-counter').innerHTML = getUsageDisplay('anchor-text');
+  const prompt = `Generate ${count} natural anchor text variations for the keyword "${kw}" linking to ${url||'a webpage'}. Include a mix of: exact match, partial match, branded, generic, long-tail, LSI, naked URL style. Format as HTML table with: Anchor Text, Type, Risk Level (Safe/Medium/Risky). Dark theme table. Mark risky ones in red, safe ones in green.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('at-result').innerHTML = `<div class="tool-box">${result}<button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="copyText('at-result')">📋 Copy All</button></div>`;
+  } catch(e){ document.getElementById('at-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error.</div>'; }
+}
+
+// ===== ROBOTS GEN =====
+function renderRobotsGen(){
+  return `
+    <div class="tool-header">
+      <h2>🤖 Robots.txt Generator</h2>
+      <p>Create the perfect robots.txt for your website</p>
+    </div>
+    <div class="tool-box">
+      <div class="form-group"><label>Website Platform</label>
+        <select class="input" id="rg-platform">
+          <option value="WordPress">WordPress</option>
+          <option value="Shopify">Shopify</option>
+          <option value="custom HTML">Custom HTML</option>
+          <option value="React/Next.js">React/Next.js</option>
+          <option value="Wix">Wix</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Sitemap URL (optional)</label><input class="input" id="rg-sitemap" placeholder="https://yoursite.com/sitemap.xml"/></div>
+      <div class="form-group"><label>Folders to Block (comma separated)</label><input class="input" id="rg-block" placeholder="e.g. /admin/, /private/, /temp/"/></div>
+      <div class="form-group"><label>Allow All Search Engines?</label>
+        <select class="input" id="rg-allow"><option value="yes">Yes — Allow All</option><option value="no">No — Block all except Google</option></select>
+      </div>
+      <button class="btn btn-primary" onclick="runRobotsGen()">🤖 Generate robots.txt</button>
+      <div class="use-counter" id="rg-counter">${getUsageDisplay('robots-gen')}</div>
+    </div>
+    <div id="rg-result"></div>`;
+}
+async function runRobotsGen(){
+  const platform = document.getElementById('rg-platform').value;
+  const sitemap = document.getElementById('rg-sitemap').value.trim();
+  const block = document.getElementById('rg-block').value.trim();
+  const allow = document.getElementById('rg-allow').value;
+  const ok = await checkAndUse('robots-gen');
+  if(!ok){ showUpgradeWall('rg-result'); return; }
+  document.getElementById('rg-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
+  document.getElementById('rg-counter').innerHTML = getUsageDisplay('robots-gen');
+  const prompt = `Generate an optimized robots.txt file for a ${platform} website. ${sitemap?'Sitemap: '+sitemap+'.':''} ${block?'Block these paths: '+block+'.':''} ${allow==='no'?'Allow only Googlebot, block all others.':'Allow all search engine bots.'} Also block common bad bots (scrapers, spam bots). Output ONLY the raw robots.txt content with no explanation, wrapped in a code block.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('rg-result').innerHTML = `
+      <div class="tool-box">
+        <div class="result-box" id="rg-output" style="font-family:monospace">${result}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="copyText('rg-output')">📋 Copy robots.txt</button>
+      </div>`;
+  } catch(e){ document.getElementById('rg-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error.</div>'; }
+}
+
+// ===== META GEN =====
+function renderMetaGen(){
+  return `
+    <div class="tool-header">
+      <h2>🏷️ Meta Tags Generator</h2>
+      <p>Generate perfect SEO meta titles and descriptions</p>
+    </div>
+    <div class="tool-box">
+      <div class="form-group"><label>Page Topic / Content</label><textarea class="input" id="mg-topic" placeholder="Describe your page content or paste your article title..."></textarea></div>
+      <div class="form-group"><label>Primary Keyword</label><input class="input" id="mg-kw" placeholder="e.g. guest posting services"/></div>
+      <div class="form-group"><label>Brand Name (optional)</label><input class="input" id="mg-brand" placeholder="e.g. SEOToolsPro"/></div>
+      <button class="btn btn-primary" onclick="runMetaGen()">🏷️ Generate Meta Tags</button>
+      <div class="use-counter" id="mg-counter">${getUsageDisplay('meta-gen')}</div>
+    </div>
+    <div id="mg-result"></div>`;
+}
+async function runMetaGen(){
+  const topic = document.getElementById('mg-topic').value.trim();
+  const kw = document.getElementById('mg-kw').value.trim();
+  const brand = document.getElementById('mg-brand').value.trim();
+  if(!topic){ toast("Describe your page content","error"); return; }
+  const ok = await checkAndUse('meta-gen');
+  if(!ok){ showUpgradeWall('mg-result'); return; }
+  document.getElementById('mg-result').innerHTML = '<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
+  document.getElementById('mg-counter').innerHTML = getUsageDisplay('meta-gen');
+  const prompt = `Generate SEO meta tags for: "${topic}". Primary keyword: ${kw||'not specified'}. Brand: ${brand||'none'}. Provide: 3 meta title options (max 60 chars each), 3 meta description options (max 155 chars each), Open Graph title, Open Graph description, Twitter Card title, Twitter Card description. Format clearly with labels. Also provide the complete HTML meta tag code for the best option.`;
+  try {
+    const result = await callClaude(prompt);
+    document.getElementById('mg-result').innerHTML = `
+      <div class="tool-box">
+        <div class="result-box" id="mg-output">${result}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="copyText('mg-output')">📋 Copy Tags</button>
+      </div>`;
+  } catch(e){ document.getElementById('mg-result').innerHTML = '<div class="tool-box" style="color:var(--danger)">Error.</div>'; }
+}
+
+// ===== PROFILE =====
+function renderProfile(){
+  const plan = userProfile?.plan||'free';
+  const p = PLANS[plan];
+  return `
+    <div class="tool-header"><h2>👤 My Account</h2><p>Manage your profile and subscription</p></div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:20px">Account Info</h3>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700">${(userProfile?.name||'U').charAt(0).toUpperCase()}</div>
+          <div>
+            <div style="font-size:16px;font-weight:600">${userProfile?.name||'User'}</div>
+            <div style="font-size:13px;color:var(--muted)">${currentUser?.email}</div>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:13px;color:var(--muted)">Current Plan</span>
+            <span class="badge badge-${plan}">${p.name}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:13px;color:var(--muted)">Uses per Tool</span>
+            <span style="font-size:13px">${p.limit===999?'Unlimited':p.limit+'/month'}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:13px;color:var(--muted)">Account Status</span>
+            <span class="badge badge-${userProfile?.status==='active'?'active':'inactive'}">${userProfile?.status||'active'}</span>
+          </div>
+        </div>
+        ${plan==='free'?`<button class="btn btn-primary w-full" onclick="showUpgradeModal()">⚡ Upgrade Plan</button>`:`<div style="font-size:13px;color:var(--muted);text-align:center">Thanks for being a ${p.name} member! 🎉</div>`}
+      </div>
+      <div class="card">
+        <h3 style="font-size:16px;margin-bottom:20px">Payment History</h3>
+        <div id="payment-history">
+          ${userProfile?.payments?Object.values(userProfile.payments).map(p=>`
+            <div style="padding:12px;background:var(--surface2);border-radius:8px;margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between">
+                <span style="font-size:13px;font-weight:500">${p.plan} Plan</span>
+                <span class="badge badge-${p.status==='approved'?'active':'pending'}">${p.status}</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">$${p.amount} via ${p.method} · ${new Date(p.date).toLocaleDateString()}</div>
+            </div>`).join(''):'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No payments yet</div>'}
+        </div>
+        <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--muted)">
+          <p style="margin-bottom:8px">💳 <strong style="color:var(--text)">Payment Methods Accepted:</strong></p>
+          <p>• JazzCash: <strong style="color:var(--text)">0300-0000000</strong></p>
+          <p>• Easypaisa: <strong style="color:var(--text)">0300-0000000</strong></p>
+          <p>• USDT TRC20: <strong style="color:var(--text)">TXxxxxxxxxxxxxxxxxxxxxxx</strong></p>
+          <p>• Binance Pay ID: <strong style="color:var(--text)">123456789</strong></p>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ===== UPGRADE =====
+function showUpgradeModal(){
+  const el = document.getElementById('upgrade-plans-list');
+  el.innerHTML = ['starter','pro','agency'].map(key=>{
+    const p = PLANS[key];
+    return `
+      <div class="card card-hover" style="margin-bottom:12px;cursor:pointer" onclick="showPaymentModal('${key}','monthly')">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <span class="badge badge-${key}" style="margin-bottom:8px">${p.name}</span>
+            <div style="font-size:22px;font-weight:700">$${p.monthly}<span style="font-size:14px;font-weight:400;color:var(--muted)">/mo</span></div>
+            <div style="font-size:12px;color:var(--success)">or $${p.yearly}/year</div>
+          </div>
+          <div style="font-size:13px;color:var(--muted)">
+            <div>✓ ${p.limit===999?'Unlimited':'Up to '+p.limit} uses/tool</div>
+            ${key==='pro'||key==='agency'?'<div>✓ All AI tools</div>':''}
+            ${key==='agency'?'<div>✓ 3 team accounts</div>':''}
+          </div>
+          <button class="btn btn-primary btn-sm">Upgrade →</button>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('upgrade-modal').classList.remove('hidden');
+}
+
+function showPaymentModal(planKey, billing){
+  document.getElementById('upgrade-modal').classList.add('hidden');
+  const p = PLANS[planKey];
+  const amount = billing==='yearly'?p.yearly:p.monthly;
+  document.getElementById('payment-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px;padding:16px;background:var(--surface2);border-radius:10px">
+      <div style="font-size:13px;color:var(--muted)">Upgrading to</div>
+      <div style="font-size:24px;font-weight:700;margin:4px 0"><span class="badge badge-${planKey}">${p.name}</span></div>
+      <div style="font-size:28px;font-weight:700;color:var(--accent)">$${amount}</div>
+      <div style="font-size:13px;color:var(--muted)">${billing==='yearly'?'per year':'per month'}</div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-ghost btn-sm ${billing==='monthly'?'btn-primary':''}" onclick="showPaymentModal('${planKey}','monthly')">Monthly</button>
+        <button class="btn btn-ghost btn-sm ${billing==='yearly'?'btn-primary':''}" onclick="showPaymentModal('${planKey}','yearly')">Yearly <span style="color:var(--success)">Save!</span></button>
+      </div>
+    </div>
+    <div class="payment-methods">
+      <div class="pay-method" onclick="selectPayMethod(this,'jazzcash')">
+        <h4>📱 JazzCash</h4>
+        <p>Send to: 0300-0000000 (Update with your number)</p>
+      </div>
+      <div class="pay-method" onclick="selectPayMethod(this,'easypaisa')">
+        <h4>💚 Easypaisa</h4>
+        <p>Send to: 0300-0000000 (Update with your number)</p>
+      </div>
+      <div class="pay-method" onclick="selectPayMethod(this,'usdt')">
+        <h4>💎 USDT TRC20</h4>
+        <p>Send to wallet address (Update with your wallet)</p>
+      </div>
+      <div class="pay-method" onclick="selectPayMethod(this,'binance')">
+        <h4>🟡 Binance Pay</h4>
+        <p>Binance Pay ID: 123456789 (Update with your ID)</p>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="form-group"><label>Transaction ID / Reference</label><input class="input" id="txn-id" placeholder="Paste your transaction ID or reference number"/></div>
+      <div class="form-group"><label>Your WhatsApp Number (for confirmation)</label><input class="input" id="txn-wa" placeholder="e.g. 0300-1234567"/></div>
+      <button class="btn btn-primary w-full" onclick="submitPayment('${planKey}','${billing}',${amount})">✅ I've Paid — Submit for Review</button>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px">Your account will be activated within 1-2 hours after payment verification</p>
+    </div>`;
+  document.getElementById('payment-modal').classList.remove('hidden');
+}
+
+function selectPayMethod(el, method){
+  document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('selected'));
+  el.classList.add('selected');
+  el.dataset.method = method;
+}
+
+async function submitPayment(planKey, billing, amount){
+  const txn = document.getElementById('txn-id').value.trim();
+  const wa = document.getElementById('txn-wa').value.trim();
+  const selectedMethod = document.querySelector('.pay-method.selected');
+  if(!txn||!selectedMethod){ toast("Fill transaction ID and select payment method","error"); return; }
+  const method = selectedMethod.querySelector('h4').textContent;
+  const payData = {plan:planKey, billing, amount, method, txn, whatsapp:wa, status:'pending', date:Date.now(), email:currentUser.email};
+  await db.ref(`payments/${currentUser.uid}/${Date.now()}`).set(payData);
+  await db.ref(`users/${currentUser.uid}/paymentPending`).set(true);
+  document.getElementById('payment-modal').classList.add('hidden');
+  toast("Payment submitted! We'll activate your account within 1-2 hours 🎉","success");
+}
+
+function showUpgradeWall(targetId){
+  document.getElementById(targetId).innerHTML = `
+    <div class="upgrade-wall">
+      <div style="font-size:48px;margin-bottom:16px">🔒</div>
+      <h3>You've Hit Your Monthly Limit</h3>
+      <p>Upgrade to continue using this tool and unlock unlimited access to all ${TOOLS_LIST.length} tools.</p>
+      <button class="btn btn-primary btn-lg" onclick="showUpgradeModal()">⚡ Upgrade Now</button>
+      <p style="font-size:13px;color:var(--muted);margin-top:16px">Plans start at just $9/month</p>
+    </div>`;
+}
+
+// ===== ADMIN PANEL =====
+function renderAdmin(){
+  if(currentUser?.email !== ADMIN_EMAIL && !userProfile?.isAdmin){
+    return '<div class="card" style="text-align:center;padding:40px;color:var(--danger)">Access Denied</div>';
+  }
+  return `
+    <div class="tool-header"><h2>🛡️ Admin Panel</h2><p>Manage users, payments, and subscriptions</p></div>
+    <div class="stat-cards" id="admin-stats">
+      <div class="stat-card"><div class="spinner" style="width:24px;height:24px;margin:0 auto"></div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="adminFilter('all')">All Users</button>
+      <button class="btn btn-ghost btn-sm" onclick="adminFilter('pending')">⏳ Pending</button>
+      <button class="btn btn-ghost btn-sm" onclick="adminFilter('pro')">Pro</button>
+      <button class="btn btn-ghost btn-sm" onclick="adminFilter('free')">Free</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Plan</th><th>Status</th><th>Payment</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="admin-users-table"><tr><td colspan="6" style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div style="margin-top:24px">
+      <h3 style="font-size:16px;margin-bottom:16px">⏳ Pending Payments</h3>
+      <div id="admin-payments"></div>
+    </div>`;
+}
+
+let allAdminUsers = [];
+async function loadAdminData(){
+  if(currentUser?.email !== ADMIN_EMAIL && !userProfile?.isAdmin) return;
+  // Load users
+  const snap = await db.ref('users').get();
+  allAdminUsers = [];
+  let total=0, paid=0, pending=0;
+  if(snap.exists()) snap.forEach(u=>{
+    const d = {id:u.key,...u.val()};
+    allAdminUsers.push(d);
+    total++;
+    if(d.plan&&d.plan!=='free') paid++;
+    if(d.paymentPending) pending++;
+  });
+  // Stats
+  document.getElementById('admin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num" style="color:var(--accent)">${total}</div><div class="stat-label">Total Users</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--success)">${paid}</div><div class="stat-label">Paid Users</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--warning)">${pending}</div><div class="stat-label">Pending Payments</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--danger)">${total-paid}</div><div class="stat-label">Free Users</div></div>`;
+  renderAdminTable(allAdminUsers);
+  // Load payments
+  const psnap = await db.ref('payments').get();
+  let pendingPayments = [];
+  if(psnap.exists()) psnap.forEach(u=>{ u.forEach(p=>{ const d=p.val(); if(d.status==='pending') pendingPayments.push({uid:u.key,pid:p.key,...d}); }); });
+  const pel = document.getElementById('admin-payments');
+  if(!pel) return;
+  if(!pendingPayments.length){ pel.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:20px">No pending payments</div>'; return; }
+  pel.innerHTML = pendingPayments.map(p=>`
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:14px;font-weight:600">${p.email}</div>
+          <div style="font-size:12px;color:var(--muted)">Plan: ${p.plan} (${p.billing}) · $${p.amount} · ${p.method}</div>
+          <div style="font-size:12px;color:var(--muted)">TXN: ${p.txn} · WA: ${p.whatsapp||'—'}</div>
+          <div style="font-size:11px;color:var(--muted)">${new Date(p.date).toLocaleString()}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <button class="btn btn-success btn-sm" onclick="approvePayment('${p.uid}','${p.pid}','${p.plan}')">✓ Approve</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectPayment('${p.uid}','${p.pid}')">✗ Reject</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAdminTable(users){
+  const tbody = document.getElementById('admin-users-table');
+  if(!tbody) return;
+  if(!users.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">No users found</td></tr>'; return; }
+  tbody.innerHTML = users.map(u=>`
+    <tr>
+      <td><div style="font-size:13px;font-weight:500">${u.name||'—'}</div><div style="font-size:11px;color:var(--muted)">${u.email||''}</div></td>
+      <td><span class="badge badge-${u.plan||'free'}">${PLANS[u.plan||'free']?.name||'Free'}</span></td>
+      <td><span class="badge badge-${u.status==='active'?'active':'inactive'}">${u.status||'active'}</span></td>
+      <td>${u.paymentPending?'<span class="badge badge-pending">Pending</span>':'<span style="font-size:12px;color:var(--muted)">—</span>'}</td>
+      <td style="font-size:12px;color:var(--muted)">${u.joinedAt?new Date(u.joinedAt).toLocaleDateString():''}</td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <select class="input" style="padding:4px 6px;font-size:11px;width:80px" onchange="changePlan('${u.id}',this.value)">
+            ${Object.keys(PLANS).map(k=>`<option value="${k}" ${(u.plan||'free')===k?'selected':''}>${PLANS[k].name}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm ${u.status==='active'?'btn-danger':'btn-success'}" onclick="toggleUser('${u.id}','${u.status||'active'}')" style="padding:4px 8px;font-size:11px">${u.status==='active'?'Ban':'Unban'}</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function adminFilter(type){
+  let filtered = allAdminUsers;
+  if(type==='pending') filtered = allAdminUsers.filter(u=>u.paymentPending);
+  else if(type!=='all') filtered = allAdminUsers.filter(u=>(u.plan||'free')===type);
+  renderAdminTable(filtered);
+}
+
+async function changePlan(uid, plan){
+  await db.ref(`users/${uid}/plan`).set(plan);
+  await db.ref(`users/${uid}/paymentPending`).remove();
+  toast(`Plan updated to ${PLANS[plan].name}`,"success");
+  loadAdminData();
+}
+async function toggleUser(uid, currentStatus){
+  const newStatus = currentStatus==='active'?'banned':'active';
+  await db.ref(`users/${uid}/status`).set(newStatus);
+  if(newStatus==='banned') await db.ref(`sessions/${uid}`).remove();
+  toast(`User ${newStatus}`,"success");
+  loadAdminData();
+}
+async function approvePayment(uid, pid, plan){
+  await db.ref(`users/${uid}/plan`).set(plan);
+  await db.ref(`users/${uid}/paymentPending`).remove();
+  await db.ref(`payments/${uid}/${pid}/status`).set('approved');
+  toast("Payment approved! Plan activated.","success");
+  loadAdminData();
+}
+async function rejectPayment(uid, pid){
+  await db.ref(`payments/${uid}/${pid}/status`).set('rejected');
+  await db.ref(`users/${uid}/paymentPending`).remove();
+  toast("Payment rejected","info");
+  loadAdminData();
+}
+
+// ===== UTILS =====
+function copyText(id){
+  const text = document.getElementById(id)?.innerText||'';
+  navigator.clipboard.writeText(text).then(()=>toast("Copied!","success")).catch(()=>toast("Copy failed","error"));
+}
+</script>
+
+<!-- Firebase Security Rules reminder comment -->
+<!-- Set these rules in Firebase Console > Realtime Database > Rules:
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    },
+    "sessions": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "backlinks": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "campaigns": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "payments": {
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    }
+  }
+}
+-->
+</body>
+</html>
