@@ -355,7 +355,7 @@ tr:hover td{background:var(--surface2)}
 <script>
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
-  apiKey: "AQ.Ab8RN6KvOD5LJ732sui7yBfKT1v-ylgG8eT8t0pBA7bWiMj29w",
+  apiKey: "AIzaSyAEbRa5eMTqwuAVWFIMlgJX7bk8bwBIR7U",
   authDomain: "seo-tools-c56f1.firebaseapp.com",
   projectId: "seo-tools-c56f1",
   storageBucket: "seo-tools-c56f1.firebasestorage.app",
@@ -597,7 +597,7 @@ function getUsageDisplay(toolId){
 }
 
 // ===== GEMINI API =====
-const GEMINI_API_KEY = "AIzaSyAQ.Ab8RN6KKidDiURAqk_9ceT55m9L-7qgxBPkaEJiXJYnI1IXAUQ";
+const GEMINI_API_KEY = "AQ.Ab8RN6KmeFm3gnwUsFxK8Z5TNYtz-NcMAbjTcpZyg6FJS9MCa";
 async function callClaude(prompt){
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,{
     method:"POST",
@@ -607,7 +607,8 @@ async function callClaude(prompt){
     })
   });
   const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "Error generating response.";
+  if(data.error){ console.error("Gemini:",data.error); throw new Error(data.error.message||"API Error"); }
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
 }
 
 // ===== LANDING RENDERS =====
