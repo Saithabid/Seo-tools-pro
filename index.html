@@ -251,7 +251,7 @@ tr:hover td{background:var(--surface2)}
 
   <div style="text-align:center;padding:48px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px">
     <p>© 2025 SEOToolsPro · All rights reserved</p>
-    <p style="margin-top:8px">Payment: JazzCash · Easypaisa · USDT TRC20 · Binance Pay</p>
+    <p style="margin-top:8px">Payment: USDT TRC20 · Binance Pay</p>
   </div>
 </div>
 
@@ -368,7 +368,7 @@ const auth = firebase.auth();
 const db = firebase.database();
 
 // ===== CONSTANTS =====
-const ADMIN_EMAIL = "waqas@seotoolspro.com"; // Change to your email
+const ADMIN_EMAIL = "sgoipvtlimited@gmail.com";
 const PLANS = {
   free:    {name:"Free",    monthly:0,  yearly:0,   limit:5,   color:"#2ed573"},
   starter: {name:"Starter", monthly:9,  yearly:79,  limit:50,  color:"#7b8cde"},
@@ -596,19 +596,18 @@ function getUsageDisplay(toolId){
   return `Uses this month: ${current}/${limit}`;
 }
 
-// ===== CLAUDE API =====
+// ===== GEMINI API =====
+const GEMINI_API_KEY = "AIzaSyAQ.Ab8RN6KKidDiURAqk_9ceT55m9L-7qgxBPkaEJiXJYnI1IXAUQ";
 async function callClaude(prompt){
-  const res = await fetch("https://api.anthropic.com/v1/messages",{
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      model:"claude-sonnet-4-6",
-      max_tokens:1000,
-      messages:[{role:"user",content:prompt}]
+      contents:[{parts:[{text:prompt}]}]
     })
   });
   const data = await res.json();
-  return data.content?.[0]?.text || "Error generating response.";
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "Error generating response.";
 }
 
 // ===== LANDING RENDERS =====
@@ -1284,21 +1283,13 @@ function showPaymentModal(planKey, billing){
       </div>
     </div>
     <div class="payment-methods">
-      <div class="pay-method" onclick="selectPayMethod(this,'jazzcash')">
-        <h4>📱 JazzCash</h4>
-        <p>Send to: 0300-0000000 (Update with your number)</p>
-      </div>
-      <div class="pay-method" onclick="selectPayMethod(this,'easypaisa')">
-        <h4>💚 Easypaisa</h4>
-        <p>Send to: 0300-0000000 (Update with your number)</p>
-      </div>
       <div class="pay-method" onclick="selectPayMethod(this,'usdt')">
         <h4>💎 USDT TRC20</h4>
-        <p>Send to wallet address (Update with your wallet)</p>
+        <p>Wallet: TGEDddhWQU3YHWoixk3zJK9X5WJrCAMkAc</p>
       </div>
       <div class="pay-method" onclick="selectPayMethod(this,'binance')">
         <h4>🟡 Binance Pay</h4>
-        <p>Binance Pay ID: 123456789 (Update with your ID)</p>
+        <p>Binance Pay ID: 564334864</p>
       </div>
     </div>
     <div style="margin-top:16px">
