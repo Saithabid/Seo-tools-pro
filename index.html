@@ -249,11 +249,42 @@ tr:hover td{background:var(--surface2)}
   </div>
   <div class="pricing-grid" id="landing-pricing"></div>
 
-  <div style="text-align:center;padding:48px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px">
-    <p>© 2025 SEOToolsPro · All rights reserved</p>
-    <p style="margin-top:8px">Payment: USDT TRC20 · Binance Pay</p>
-    <p style="margin-top:6px">📧 Support: <a href="mailto:sgoipvtlimited@gmail.com" style="color:var(--accent)">sgoipvtlimited@gmail.com</a></p>
-  </div>
+  <footer style="border-top:1px solid var(--border);padding:48px 24px 24px;margin-top:32px">
+    <div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:32px;margin-bottom:32px">
+      <div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:12px">⚡ SEO<span style="color:var(--accent)">Tools</span>Pro</div>
+        <p style="color:var(--muted);font-size:13px;line-height:1.6">The ultimate guest post & SEO toolkit for agencies and freelancers worldwide.</p>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:12px;font-size:14px">Plans</div>
+        <div style="color:var(--muted);font-size:13px;line-height:2">
+          <div>🆓 Free — 5 uses/tool</div>
+          <div>⚡ Starter — $9/mo</div>
+          <div>🚀 Pro — $19/mo</div>
+          <div>🏢 Agency — $39/mo</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:12px;font-size:14px">Support</div>
+        <div style="color:var(--muted);font-size:13px;line-height:2">
+          <div>📧 <a href="mailto:sgoi***@gmail.com" style="color:var(--muted);text-decoration:none" onmouseover="this.textContent='sgoipvtlimited@gmail.com';this.style.color='var(--accent)'" onmouseout="this.textContent='sgoi***@gmail.com';this.style.color='var(--muted)'">sgoi***@gmail.com</a></div>
+          <div>⏱ Response: 1-2 hours</div>
+          <div>💬 Payment queries welcome</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:12px;font-size:14px">Payment</div>
+        <div style="color:var(--muted);font-size:13px;line-height:2">
+          <div>💎 USDT TRC20</div>
+          <div>🟡 Binance Pay</div>
+          <div style="font-size:11px;margin-top:4px;color:var(--muted)">Activation within 1-2 hrs</div>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:20px;text-align:center;color:var(--muted);font-size:12px">
+      <p>© 2025 SEOToolsPro · All rights reserved · Built for SEO Professionals</p>
+    </div>
+  </footer>
 </div>
 
 <!-- ===== AUTH MODAL ===== -->
@@ -336,6 +367,8 @@ tr:hover td{background:var(--surface2)}
       <div class="sidebar-item" onclick="showPage('keyword-gap')"><span class="icon">🔑</span>Keyword Gap</div>
       <div class="sidebar-item" onclick="showPage('anchor-text')"><span class="icon">⚓</span>Anchor Text Gen</div>
       <div class="sidebar-item" onclick="showPage('robots-gen')"><span class="icon">🤖</span>Robots.txt Gen</div>
+      <div class="sidebar-item" onclick="showPage('meta-gen')"><span class="icon">🏷️</span>Meta Tags Gen</div>
+      <div class="sidebar-item" onclick="showPage('ai-assistant')"><span class="icon">💬</span>AI Assistant</div>
       <div class="sidebar-section">Account</div>
       <div class="sidebar-item" onclick="showPage('profile')"><span class="icon">👤</span>My Account</div>
       <div class="sidebar-item" onclick="showUpgradeModal()"><span class="icon">⚡</span>Upgrade</div>
@@ -386,7 +419,8 @@ const TOOLS_LIST = [
   {id:"keyword-gap",    name:"Keyword Gap Analyzer",      icon:"🔑", desc:"Find keyword opportunities your competitors rank for"},
   {id:"anchor-text",    name:"Anchor Text Generator",     icon:"⚓", desc:"Generate natural anchor text variations for links"},
   {id:"robots-gen",     name:"Robots.txt Generator",      icon:"🤖", desc:"Create optimized robots.txt for your website"},
-  {id:"meta-gen",       name:"Meta Tags Generator",       icon:"🏷️", desc:"Generate perfect SEO meta titles and descriptions"}
+  {id:"meta-gen",       name:"Meta Tags Generator",       icon:"🏷️", desc:"Generate perfect SEO meta titles and descriptions"},
+  {id:"ai-assistant",   name:"AI SEO Assistant",           icon:"🤖", desc:"Ask anything about SEO, guest posting, and link building"}
 ];
 
 // ===== STATE =====
@@ -534,6 +568,7 @@ function showApp(){
 }
 
 function showPage(id){
+  history.pushState({page:id},"","#"+id);
   currentPage = id;
   // Update sidebar active
   document.querySelectorAll('.sidebar-item').forEach(el=>{
@@ -558,6 +593,7 @@ function showPage(id){
     case 'meta-gen': mc.innerHTML = renderMetaGen(); break;
     case 'profile': mc.innerHTML = renderProfile(); break;
     case 'admin': mc.innerHTML = renderAdmin(); loadAdminData(); break;
+    case 'ai-assistant': mc.innerHTML = renderAIAssistant(); break;
     default: mc.innerHTML = renderDashboard();
   }
 }
@@ -651,7 +687,7 @@ function renderLandingPricing(){
 // ===== DASHBOARD =====
 function renderDashboard(){
   const plan = userProfile?.plan||'free';
-  const usageItems = TOOLS_LIST.slice(0,4).map(t=>{
+  const usageItems = TOOLS_LIST.slice(0,5).map(t=>{
     const key = getUsageKey(t.id);
     const used = userProfile?.usage?.[key]||0;
     const limit = getLimit();
@@ -684,7 +720,7 @@ function renderDashboard(){
       </div>
       <div class="card">
         <h3 style="margin-bottom:16px;font-size:16px">🚀 Quick Actions</h3>
-        ${TOOLS_LIST.slice(0,5).map(t=>`
+        ${TOOLS_LIST.slice(0,6).map(t=>`
           <div onclick="showPage('${t.id}')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;margin-bottom:6px;transition:background .2s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
             <span style="font-size:20px">${t.icon}</span>
             <div><div style="font-size:13px;font-weight:500">${t.name}</div><div style="font-size:11px;color:var(--muted)">${t.desc}</div></div>
@@ -1240,10 +1276,8 @@ function renderProfile(){
         </div>
         <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--muted)">
           <p style="margin-bottom:8px">💳 <strong style="color:var(--text)">Payment Methods Accepted:</strong></p>
-          <p>• JazzCash: <strong style="color:var(--text)">0300-0000000</strong></p>
-          <p>• Easypaisa: <strong style="color:var(--text)">0300-0000000</strong></p>
-          <p>• USDT TRC20: <strong style="color:var(--text)">TXxxxxxxxxxxxxxxxxxxxxxx</strong></p>
-          <p>• Binance Pay ID: <strong style="color:var(--text)">123456789</strong></p>
+          <p>• 💎 USDT TRC20: <strong style="color:var(--text)">TGEDddhWQU3YHWoixk3zJK9X5WJrCAMkAc</strong></p>
+          <p>• 🟡 Binance Pay ID: <strong style="color:var(--text)">564334864</strong></p>
         </div>
       </div>
     </div>`;
@@ -1515,3 +1549,29 @@ function copyText(id){
 -->
 </body>
 </html>
+<script>
+// ===== AI ASSISTANT =====
+function renderAIAssistant(){
+  return '<div class="tool-header"><h2>💬 AI SEO Assistant</h2><p>Ask anything about SEO, guest posting, link building, or outreach</p></div><div class="card" style="margin-bottom:16px"><div id="ai-chat-box" style="min-height:280px;max-height:420px;overflow-y:auto;padding:8px;margin-bottom:16px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)"><div style="padding:12px;background:rgba(108,99,255,.1);border-radius:8px;margin-bottom:8px;font-size:13px"><strong style="color:var(--accent)">🤖 AI Assistant:</strong><p style="margin-top:6px;color:var(--muted)">Hi! Ask me anything about guest posting, link building, keyword strategy, or outreach. I am here to help! 🚀</p></div></div><div style="display:flex;gap:8px"><input class="input" id="ai-question" placeholder="Ask me anything about SEO..." style="flex:1" onkeydown="if(event.key===Enter)askAI()"/><button class="btn btn-primary" onclick="askAI()">Ask 💬</button></div><div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"><button class="btn btn-ghost btn-sm" onclick="document.getElementById(ai-question).value=How do I find guest post opportunities?;askAI()">Guest post tips</button><button class="btn btn-ghost btn-sm" onclick="document.getElementById(ai-question).value=What makes a good outreach email?;askAI()">Outreach tips</button><button class="btn btn-ghost btn-sm" onclick="document.getElementById(ai-question).value=How to improve domain authority?;askAI()">Improve DA</button></div></div>';
+}
+async function askAI(){
+  var q=document.getElementById('ai-question').value.trim();
+  if(!q)return;
+  var box=document.getElementById('ai-chat-box');
+  box.innerHTML+='<div style="padding:10px 12px;background:var(--surface);border-radius:8px;margin-bottom:8px;font-size:13px;text-align:right"><strong>You:</strong> '+q+'</div>';
+  document.getElementById('ai-question').value='';
+  box.innerHTML+='<div id="ai-typing" style="padding:10px 12px;background:rgba(108,99,255,.1);border-radius:8px;margin-bottom:8px;font-size:13px"><strong style="color:var(--accent)">🤖 AI:</strong> <span style="color:var(--muted)">Thinking...</span></div>';
+  box.scrollTop=box.scrollHeight;
+  try{
+    var answer=await callClaude('You are an expert SEO consultant. Answer clearly in 3-5 sentences: '+q);
+    document.getElementById('ai-typing').innerHTML='<strong style="color:var(--accent)">🤖 AI:</strong><div style="margin-top:6px;color:var(--muted);line-height:1.6">'+answer+'</div>';
+  }catch(e){
+    document.getElementById('ai-typing').innerHTML='<strong style="color:red">Error:</strong> Try again.';
+  }
+  box.scrollTop=box.scrollHeight;
+}
+window.addEventListener('popstate',function(e){
+  if(currentUser&&e.state&&e.state.page)showPage(e.state.page);
+  else if(currentUser)showPage('dashboard');
+});
+</script>
