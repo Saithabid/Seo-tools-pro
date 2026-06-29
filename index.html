@@ -420,7 +420,6 @@ tr:hover td{background:var(--surface2)}
       <div class="sidebar-item" onclick="showPage('content-brief')"><span class="icon">📝</span>Content Brief</div>
       <div class="sidebar-item" onclick="showPage('backlink-tracker')"><span class="icon">🔗</span>Backlink Tracker</div>
       <div class="sidebar-item" onclick="showPage('campaign')"><span class="icon">🎯</span>Campaign Manager</div>
-      <div class="sidebar-item" onclick="showPage('da-checker')"><span class="icon">📈</span>DA Checker</div>
       <div class="sidebar-item" onclick="showPage('keyword-gap')"><span class="icon">🔑</span>Keyword Gap</div>
       <div class="sidebar-item" onclick="showPage('anchor-text')"><span class="icon">⚓</span>Anchor Text Gen</div>
       <div class="sidebar-item" onclick="showPage('robots-gen')"><span class="icon">🤖</span>Robots.txt Gen</div>
@@ -472,7 +471,6 @@ const TOOLS_LIST = [
   {id:"content-brief",   name:"Content Brief Generator",   icon:"📝", desc:"SEO-optimized content briefs with headings & keywords"},
   {id:"backlink-tracker",name:"Backlink Tracker",          icon:"🔗", desc:"Track status of all your submitted backlinks"},
   {id:"campaign",        name:"Campaign Manager",          icon:"🎯", desc:"Manage all your outreach campaigns in one place"},
-  {id:"da-checker",      name:"Domain Authority Checker",  icon:"📈", desc:"Estimate domain authority and SEO metrics"},
   {id:"keyword-gap",     name:"Keyword Gap Analyzer",      icon:"🔑", desc:"Find keyword opportunities your competitors rank for"},
   {id:"anchor-text",     name:"Anchor Text Generator",     icon:"⚓", desc:"Generate natural anchor text variations for links"},
   {id:"robots-gen",      name:"Robots.txt Generator",      icon:"🤖", desc:"Create optimized robots.txt for your website"},
@@ -645,7 +643,6 @@ function showPage(id, addToHistory=true){
     case 'content-brief':    mc.innerHTML = renderContentBrief(); break;
     case 'backlink-tracker': mc.innerHTML = renderBacklinkTracker(); loadBacklinks(); break;
     case 'campaign':         mc.innerHTML = renderCampaign(); loadCampaigns(); break;
-    case 'da-checker':       mc.innerHTML = renderDAChecker(); break;
     case 'keyword-gap':      mc.innerHTML = renderKeywordGap(); break;
     case 'anchor-text':      mc.innerHTML = renderAnchorText(); break;
     case 'robots-gen':       mc.innerHTML = renderRobotsGen(); break;
@@ -1127,30 +1124,6 @@ async function deleteCampaign(id){
   loadCampaigns();
 }
 
-// ===== DA CHECKER =====
-function renderDAChecker(){
-  return `
-    <div class="tool-header"><h2>📈 Domain Authority Checker</h2><p>Estimate domain authority and SEO metrics</p></div>
-    <div class="tool-box">
-      <div class="form-group"><label>Enter Domain(s) — one per line</label>
-        <textarea class="input" id="da-domains" placeholder="example.com&#10;another-site.com&#10;thirdsite.net" style="min-height:120px"></textarea>
-      </div>
-      <button class="btn btn-primary" onclick="runDAChecker()">📈 Check Authority</button>
-      <div class="use-counter" id="da-counter">${getUsageDisplay('da-checker')}</div>
-    </div>
-    <div id="da-result"></div>`;
-}
-async function runDAChecker(){
-  const domains=document.getElementById('da-domains').value.trim();
-  if(!domains){toast("Enter at least one domain","error");return;}
-  const ok=await checkAndUse('da-checker');
-  if(!ok){showUpgradeWall('da-result');return;}
-  document.getElementById('da-result').innerHTML='<div style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></div>';
-  document.getElementById('da-counter').innerHTML=getUsageDisplay('da-checker');
-  const prompt=`You are an SEO tool. For these domains: ${domains} — provide estimated SEO metrics in an HTML table. Columns: Domain, DA Score (1-100), PA Score, Spam Score, Est. Monthly Traffic, Backlinks Est., Verdict (Good/Average/Poor for guest posting). Use realistic but fictional numbers. Style the table with dark theme: header bg #1a1a26, borders #2a2a3a, text #f0f0f8. Color the Verdict cell: green for Good, yellow for Average, red for Poor.`;
-  try{const result=await callClaude(prompt);document.getElementById('da-result').innerHTML=`<div class="tool-box">${result}</div>`;}
-  catch(e){document.getElementById('da-result').innerHTML='<div class="tool-box" style="color:var(--danger)">Error. Please try again.</div>';}
-}
 
 // ===== KEYWORD GAP =====
 function renderKeywordGap(){
